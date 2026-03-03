@@ -1,6 +1,7 @@
 import cv2 as cv
 import mediapipe as mp
 import time
+import numpy as np
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 print("Mediapipe",mp.__version__)
@@ -44,7 +45,12 @@ while(True):
         cv.circle(frame, (index_pixel_x, index_pixel_y), 15, (0, 255, 0), -1)
         cv.circle(frame, (thumb_pixel_x, thumb_pixel_y), 15, (255, 0, 0), -1)
         cv.circle(frame, (pinky_pixel_x, pinky_pixel_y), 15, (0, 0, 255), -1)
-
+        landmark_list = []
+        for id, landmark in enumerate(hand_landmarks.landmark):
+            landmark_list.append([landmark.x, landmark.y, landmark.z])
+            flat = np.array(landmark_list).flatten()
+        print(flat)
+        print("Total landmarks:", len(landmark_list))
         print(f"Pixels → x:{index_pixel_x} y:{index_pixel_y}")
 
     cv.imshow("window",frame)
