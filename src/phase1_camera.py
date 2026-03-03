@@ -1,4 +1,8 @@
+import time
 import cv2 as cv
+current_time = time.time()
+prev_time = current_time
+print(current_time)
 print("OpenCv",cv.__version__)
 cap = cv.VideoCapture(0)
 print(cap.isOpened())
@@ -9,10 +13,14 @@ gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 print("Color shape", frame.shape)
 print("Gray shape", gray.shape)
 while True:
+    curr_time = time.time()
+    fps = 1/(curr_time - prev_time)
+    prev_time = curr_time
     success , frame = cap.read()
     if not success:
         break
     gray = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+    cv.putText(gray,f"FPS:{int(fps)}",(10,30),cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv.imshow("color ", frame)
     cv.imshow("gray ", gray)
     if cv.waitKey(1) & 0xFF == ord('q'):
