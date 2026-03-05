@@ -6,16 +6,17 @@ import cv2
 import mediapipe as mp
 import json
 from fastapi.staticfiles import StaticFiles
-
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="demo/static"), name="static")
+app.mount("/static", StaticFiles(directory="demo/static", check_dir=False), name="static")
 
 
-model = tf.keras.models.load_model("demo/models/gesture_model.h5")
+model = tf.keras.models.load_model(os.path.join(BASE_DIR, "../models/gesture_model.h5"))
 
-with open("demo/models/label_encoder.pkl", "rb") as f:
+with open(os.path.join(BASE_DIR, "../models/label_encoder.pkl"), "rb") as f:
     label_encoder = pickle.load(f)
 
 mp_hands = mp.solutions.hands
