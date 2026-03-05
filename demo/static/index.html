@@ -1,51 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign language Reconition</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Language Recognition</title>
+<link rel="icon" href="data:,">
+<style>
+body{
+font-family:Arial, sans-serif;
+text-align:center;
+background:#111;
+color:white
+}
+video{
+transform:scaleX(-1);
+width:400px;
+border-radius:10px;
+margin-top:20px
+}
+canvas{
+display:none
+}
+h1{
+margin-top:20px;
+font-size:28px
+}
+</style>
 </head>
 <body>
-    <video id="video" style="transform: scaleX(-1)"></video>
-    <canvas id="canvas"></canvas>
-    <h1 id="result">waiting</h1>
-    <script>
-        const video = document.getElementById("video")
-        const canvas = document.getElementById("canvas")
-        const result = document.getElementById("result")
-        const ctx = canvas.getContext("2d")
-        navigator.mediaDevices.getUserMedia({video:true})
-        .then(stream=>{
-            video.srcObject = stream
-            video.play()
-        })
-const socket = new WebSocket(
-"wss://sign-language-recognition-gfl5.onrender.com/ws"
-)
-        ws.onmessage = (event) =>{
-            const data = JSON.parse(event.data)
-            result.innerHTML = `${data.gesture} - ${data.confidence.toFixed(1)}%`
 
-        }
-        function sendFrame(){
-            canvas.width = video.videoWidth
-            canvas.height = video.videoHeight
+<h2>Sign Language Recognition</h2>
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas"></canvas>
+<h1 id="result">Waiting...</h1>
 
-            ctx.save()
-            ctx.scale(-1, 1)
+<script>
+const video=document.getElementById("video")
+const canvas=document.getElementById("canvas")
+const result=document.getElementById("result")
+const ctx=canvas.getContext("2d")
 
-            ctx.drawImage(video, -canvas.width, 0)
-             ctx.restore()
-            canvas.toBlob(blob =>{
-                if (ws.readyState === WebSocket.OPEN) {
-            blob.arrayBuffer().then(buffer => {
-                ws.send(buffer)
-            })
-        }
-    }, "image/jpeg")
-        }
-        setInterval(sendFrame, 100)
+navigator.mediaDevices.getUserMedia({video:true}).then(stream=>{
+video.srcObject=stream
+video.play()
+})
 
-    </script>
+const ws=new WebSocket("wss://sign-language-recognition-gfl5.onrender.com/ws")
+
+ws.onmessage=(event)=>{
+const data=JSON.parse(event.data)
+result.innerHTML=`${data.gesture} - ${data.confidence.toFixed(1)}%`
+}
+
+function sendFrame(){
+if(video.videoWidth===0)return
+canvas.width=video.videoWidth
+canvas.height=video.videoHeight
+ctx.save()
+ctx.scale(-1,1)
+ctx.drawImage(video,-canvas.width,0)
+ctx.restore()
+canvas.toBlob(blob=>{
+if(ws.readyState===WebSocket.OPEN){
+blob.arrayBuffer().then(buffer=>{
+ws.send(buffer)
+})
+}
+},"image/jpeg")
+}
+
+setInterval(sendFrame,100)
+</script>
+
 </body>
 </html>
