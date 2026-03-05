@@ -2,8 +2,8 @@ fastapi
 uvicorn
 websockets
 python-multipart
-opencv-python-headless
-mediapipe
+Pillow
+mediapipe==0.10.9
 numpy
 scikit-learn
 scipy
