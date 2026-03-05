@@ -3,9 +3,9 @@ uvicorn
 websockets
 python-multipart
 opencv-python-headless
-mediapipe==0.10.8
-numpy==1.24.3
-scikit-learn==1.3.2
-scipy==1.11.4
-pandas==2.0.3
-tensorflow==2.13.0
+mediapipe
+numpy
+scikit-learn
+scipy
+pandas
+tensorflow
