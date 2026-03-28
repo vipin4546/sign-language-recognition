@@ -1,77 +1,65 @@
 import cv2
-import mediapipe as mp
 import numpy as np
+import mediapipe as mp
 import tensorflow as tf
-from tensorflow import keras
-import pickle 
-model = keras.models.load_model('./models/gesture_model.h5')
-with open('./models/label_encoder.pkl','rb') as f:
+import pickle
+
+VERSION = "v1"
+
+model = tf.keras.models.load_model(f"models/{VERSION}/gesture_model.h5")
+with open(f"models/{VERSION}/label_encoder.pkl", "rb") as f:
     le = pickle.load(f)
-print("Model Loaded")
-print("Classes",le.classes_)
-mp_hands =  mp.solutions.hands
+
+print(f"Model loaded — {len(le.classes_)} gestures: {le.classes_}")
+
+mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
-    static_image_mode = False,
-    max_num_hands = 1,
-    min_tracking_confidence = 0.9,
-    min_detection_confidence = 0.5
+    static_image_mode=False,
+    max_num_hands=1,
+    min_detection_confidence=0.7,
+    min_tracking_confidence=0.5
 )
 
+CONFIDENCE_THRESHOLD = 0.70
+
 cap = cv2.VideoCapture(0)
+print("Press Q to quit.")
+
 while True:
-    success,frame = cap.read()
-    if not success:
+    ok, frame = cap.read()
+    if not ok:
         break
-    frame = cv2.flip(frame,1)
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    results = hands.process(rgb)
 
-    if results.multi_hand_landmarks:
-        for hand_landmarks in results.multi_hand_landmarks:
-            mp_drawing.draw_landmarks(
-                frame,
-                hand_landmarks,
-                mp_hands.HAND_CONNECTIONS
-            )
+    frame = cv2.flip(frame, 1)
+    rgb   = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    res   = hands.process(rgb)
 
-            landmark_list = []
-            for landmark in hand_landmarks.landmark:
-                landmark_list.append([landmark.x, landmark.y, landmark.z])
-            
-            flat = np.array(landmark_list).flatten()
-            flat = flat.reshape(1, 63)
-            prediction = model.predict(flat, verbose=0)
-            predicted_index = np.argmax(prediction)
-            predicted_label = le.inverse_transform([predicted_index])[0]
-            print(predicted_label)
-            cv2.putText(
-            frame,
-            predicted_label,
-            (10, 50),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            2,
-            (0, 255, 0),
-            3
-            )
-            confidence = np.max(prediction) * 100
-            cv2.putText(
-            frame,
-            f"{confidence:.1f}%",
-            (10, 100),
-            cv2.FONT_HERSHEY_SIMPLEX,
-    1,
-            (255, 255, 0),
-             2
-            )
+    if res.multi_hand_landmarks:
+        hand = res.multi_hand_landmarks[0]
+        mp_drawing.draw_landmarks(frame, hand, mp_hands.HAND_CONNECTIONS)
 
+        lms = []
+        for lm in hand.landmark:
+            lms += [lm.x, lm.y, lm.z]
 
+        pred = model.predict(np.array([lms]), verbose=0)[0]
+        top3 = pred.argsort()[-3:][::-1]
 
-    cv2.imshow("Gesture Recognition", frame)
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+        for i, idx in enumerate(top3):
+            conf  = pred[idx]
+            label = f"{le.classes_[idx]}: {conf*100:.1f}%"
+            color = (0, 255, 0) if i == 0 else (160, 160, 160)
+            cv2.putText(frame, label, (10, 45 + i * 42),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.1, color, 2)
+
+        if pred[top3[0]] < CONFIDENCE_THRESHOLD:
+            cv2.putText(frame, "LOW CONFIDENCE", (10, 175),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+    cv2.imshow(f"Model Test v{VERSION} — press Q to quit", frame)
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
+
 cap.release()
 cv2.destroyAllWindows()
-
-
