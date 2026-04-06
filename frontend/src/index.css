@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Fonts ──────────────────────────────────────── */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #FAFAFA;
+    color: #1E293B;
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar        { width: 4px; }
+  ::-webkit-scrollbar-track  { background: #F1F5F9; }
+  ::-webkit-scrollbar-thumb  { background: #CBD5E1; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #74747a; }
+
+  /* ── Selection ── */
+  ::selection {
+    background: rgba(79, 70, 229, 0.12);
+    color: #4F46E5;
+  }
+}
+
+@layer components {
+
+  /* Subtle dot-grid background for hero sections */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(79, 70, 229, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79, 70, 229, 0.035) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Frosted glass navbar */
+  .glass {
+    background: rgba(250, 250, 250, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid #E2E8F0;
+  }
+
+  /* Indigo accent border */
+  .accent-border {
+    border: 1px solid rgba(79, 70, 229, 0.25);
+  }
+
+  /* Indigo glow on text */
+  .accent-glow-text {
+    text-shadow: 0 0 24px rgba(79, 70, 229, 0.2);
+  }
+
+  /* Camera mirroring */
+  .camera-feed {
+    transform: scaleX(-1);
+  }
+
+  /* Smooth progress bar fill */
+  .progress-bar-fill {
+    transition: width 0.1s linear;
+  }
+
+  /* Fade-up for gesture characters */
+  .gesture-char {
+    animation: fadeUp 0.3s ease-out;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Syne', sans-serif;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* ── Corner bracket decorations ───────────────────────── */
+.corner-tl::before,
+.corner-br::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: #4F46E5;
+  border-style: solid;
+  opacity: 0.4;
+}
+.corner-tl::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.corner-br::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* ── Animated border glow (active gesture detect) ─────── */
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(79, 70, 229, 0.2); }
+  50%       { border-color: rgba(79, 70, 229, 0.55); }
+}
+.active-detect {
+  animation: borderGlow 1s ease-in-out infinite;
+}
+
+/* ── Camera scan-line effect ──────────────────────────── */
+@keyframes scanLine {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+.scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(79,70,229,0.5), transparent);
+  animation: scanLine 3s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Fade-up keyframe (used by gesture-char) ──────────── */
+@keyframes fadeUp {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

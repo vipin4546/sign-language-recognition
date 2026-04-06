@@ -1,6 +1,6 @@
 {
   "version": "v1",
-  "date": "2026-03-28",
+  "date": "2026-04-06",
   "total_samples": 46800,
   "num_gestures": 26,
   "gestures": [
@@ -31,6 +31,6 @@
     "Y",
     "Z"
   ],
-  "test_accuracy": 0.9989,
+  "test_accuracy": 0.9976,
   "architecture": "Dense(256) \u2192 BN \u2192 Drop(0.3) \u2192 Dense(128) \u2192 BN \u2192 Drop(0.3) \u2192 Dense(64) \u2192 Drop(0.2) \u2192 Softmax"
 }
