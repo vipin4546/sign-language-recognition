@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 websockets
 python-multipart
 Pillow
@@ -8,4 +8,4 @@ numpy
 scikit-learn
 scipy
 pandas
-tensorflow
+tensorflow-cpu
